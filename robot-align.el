@@ -1,9 +1,9 @@
-;;; robot-align.el ---                               -*- lexical-binding: t; -*-
+;;; robot-indent.el --- robot mode for emacs         -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2023  WL-BSR6043
+;; Copyright (C) 2023  Samuel Dawant
 
-;; Author: WL-BSR6043 <sam@WL-BSR6043.localdomain>
-;; Keywords: abbrev, abbrev, abbrev
+;; Author: Samuel Dawant <samueld@mailo.com>
+;; Keywords: languages
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 ;;; Commentary:
 
-;;
+;; Gather all function related to alignment
 
 ;;; Code:
 
