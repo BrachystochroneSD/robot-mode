@@ -87,9 +87,9 @@ Prefix the continuation with indentation, ellipsis and spacing."
   "Align the contents current defun."
   (interactive)
   (let ((beg (save-excursion
-		(beginning-of-defun)
-		(forward-line)
-		(point)))
+	       (beginning-of-defun)
+	       (forward-line)
+	       (point)))
 	(end (save-excursion
 	       (end-of-defun)
 	       (point))))
@@ -117,7 +117,7 @@ Prefix the continuation with indentation, ellipsis and spacing."
          (length
           (save-excursion
             (beginning-of-line) (looking-at ".*") (match-string 0)))))
-      (insert (make-string (- column (current-column)) ? ))))
+    (insert (make-string (- column (current-column)) ? ))))
 
 
 (defun robot-align-get-line-alignment (&optional number)
@@ -126,7 +126,7 @@ Prefix the continuation with indentation, ellipsis and spacing."
   (save-excursion
     (forward-line (or number 0))
     ;; (while (or (looking-at "[[:space:]]*\\(#.*\\)*$") (bobp)) ;; skip empty or comments lines
-      ;; (forward-line (or number -1)))
+    ;; (forward-line (or number -1)))
     (if (looking-at "[^ ]") ;; No defun allowed
         nil
       (let ((i 0)
