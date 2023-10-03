@@ -74,7 +74,7 @@ Prefix the continuation with indentation, ellipsis and spacing."
               (while (and chosen-col (< chosen-col (current-column)))
                 (setq chosen-col (car (pop chosen-list))))
               chosen-col)))))
-    (robot-align--goto-col-forced res-col)))
+    (robot-align--goto-col-forced (or res-col pot-col))))
 
 (defun robot-align-region-or-block ()
   "Call `robot-align-region' if region is active, otherwise `robot-align-paragraph'."
@@ -99,7 +99,6 @@ Prefix the continuation with indentation, ellipsis and spacing."
   "Align the contents of the region between BEG and END."
   (interactive
    (list (region-beginning) (region-end)))
-
   ;; Align only with spaces
   (let ((align-to-tab-stop nil))
     (align-regexp beg end "\\(\\s-\\s-+\\)"  1 robot-mode-argument-separator t))
