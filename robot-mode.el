@@ -103,7 +103,7 @@
 
 ;;; Code:
 
-(require 'align)
+(require 'robot-align)
 (require 'robot-indent)
 
 (defgroup robot nil
@@ -148,16 +148,6 @@
     (syntax-table))
   "Syntax table for Robot mode.")
 
-(defvar robot-mode-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map "\177" 'robot-indent-dedent-line-backspace)
-    (define-key map (kbd "<backtab>") 'robot-indent-dedent-line)
-    (define-key map (kbd "C-c C-a") #'robot-mode-align-region-or-defun)
-    (define-key map (kbd "C-c C-j") #'robot-mode-split-continuation)
-    (define-key map (kbd "C-c C-SPC") #'robot-mode-add-argument)
-    map)
-  "Key map for Robot mode.")
-
 (defun robot-mode-syntax-propertize (start end)
   "Propertize text between START and END."
   (funcall
@@ -183,61 +173,38 @@ Defuns are the steps of a keyword, test or task. This is used as
       (beginning-of-line)
     (goto-char (point-max))))
 
-(defun robot-mode-align (beg end)
-  "Align the contents of the region between BEG and END."
-  (interactive
-   (list (region-beginning) (region-end)))
+(defun robot-mode-delete-arguments-spaces ()
+  "Delete all arguments spaces until reaching the keyword or the previous column
+use to delete indentation too"
+  (interactive "*")
+  (let ((previous-column
+         (or (car (last (seq-filter (lambda (e) (> (current-column) e))
+                                    (mapcar 'car (or (robot-align-get-line-alignment -1)
+                                                     (robot-align-get-line-alignment 1))))))
+             0)))
+    (when (and (not (bolp))
+               (looking-back (format " \\{%d\\}" robot-mode-argument-separator)))
+      (while (and (> (current-column) previous-column)
+                 (looking-back " "))
+        (delete-char -1))
+      t)))
 
-  ;; Align only with spaces
-  (let ((align-to-tab-stop nil))
-    (align-regexp beg end "\\(\\s-\\s-+\\)"  1 robot-mode-argument-separator t))
-  (indent-region beg end))
+(defun robot-mode-delete-char-untabify (arg)
+  "De-indent current line.
+Argument ARG is passed to `backward-delete-char-untabify' when
+point is not in between the indentation."
+  (interactive "*p")
+  (unless (robot-mode-delete-arguments-spaces)
+    (backward-delete-char-untabify arg)))
 
-(defun robot-mode-align-defun ()
-  "Align the contents current defun."
-  (interactive)
-  (let ((beg (save-excursion
-		(beginning-of-defun)
-		(forward-line)
-		(point)))
-	(end (save-excursion
-	       (end-of-defun)
-	       (point))))
-    (robot-mode-align beg end)))
-
-(defun robot-mode-align-region-or-defun ()
-  "Call `robot-mode-align' if region is active, otherwise `robot-mode-align-defun'."
-  (interactive)
-  (if (region-active-p)
-      (robot-mode-align (region-beginning) (region-end))
-    (robot-mode-align-defun)))
-
-(defun robot-mode-split-continuation ()
-  "Split current line at point and continue in the next line.
-
-Prefix the continuation with indentation, ellipsis and spacing."
-  (interactive)
-  ;; If point is between the indentation and beginning of line add the
-  ;; ellipsis to the previous line. Otherwise add to the next line.
-  (if (not (<= (line-beginning-position)
-	       (point)
-	       (save-excursion
-		 (back-to-indentation) (point))))
-      (progn
-	(delete-horizontal-space)
-	(newline))
-    (beginning-of-line)
-    (newline)
-    (forward-line -1))
-  (insert "...")
-  (insert (make-string robot-mode-argument-separator ? ))
-  (indent-region (line-beginning-position) (line-end-position)))
-
-(defun robot-mode-add-argument ()
-  "Add exactly `robot-mode-argument-separator' spaces to point."
-  (interactive)
-  (delete-horizontal-space)
-  (insert (make-string robot-mode-argument-separator ? )))
+(defvar robot-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map "\177" 'robot-mode-delete-char-untabify)
+    (define-key map (kbd "C-c C-a") #'robot-align-region-or-defun)
+    (define-key map (kbd "C-c C-j") #'robot-align-split-line)
+    (define-key map (kbd "C-c C-SPC") #'robot-align-new-argument)
+    map)
+  "Key map for Robot mode.")
 
 ;;;###autoload
 (define-derived-mode robot-mode prog-mode "Robot"

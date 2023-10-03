@@ -86,26 +86,6 @@ level."
     (when follow-indentation-p
       (back-to-indentation))))
 
-(defun robot-indent-dedent-line ()
-  "De-indent current line."
-  (interactive "*")
-  (when (and (not (bolp))
-             (= (current-indentation) (current-column)))
-    (let* ((ril robot-mode-indent-level)
-           (previous-column (* ril (1- (/ (current-column) ril )))))
-      (while (and (not (bolp))
-              (> (current-column) previous-column))
-        (delete-char -1)))
-    t))
-
-(defun robot-indent-dedent-line-backspace (arg)
-  "De-indent current line.
-Argument ARG is passed to `backward-delete-char-untabify' when
-point is not in between the indentation."
-  (interactive "*p")
-  (unless (robot-indent-dedent-line)
-    (backward-delete-char-untabify arg)))
-
 (defun robot-indent--get-context ()
   "Get information about the current indentation context.
 Context is returned in a cons with the form (STATUS . START).
