@@ -122,8 +122,6 @@ Prefix the continuation with indentation, ellipsis and spacing."
   ;; CLEAME: This is not very elegant.
   (save-excursion
     (forward-line (or number 0))
-    ;; (while (or (looking-at "[[:space:]]*\\(#.*\\)*$") (bobp)) ;; skip empty or comments lines
-    ;; (forward-line (or number -1)))
     (if (looking-at "[^ ]") ;; No defun allowed
         nil
       (let ((i 0)
@@ -139,8 +137,6 @@ Prefix the continuation with indentation, ellipsis and spacing."
                                      (+ curr-col (length (nth i splitted))))))))
           (setq i (1+ i)))
         res))))
-
-
 
 (provide 'robot-align)
 ;;; robot-align.el ends here
