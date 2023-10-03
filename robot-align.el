@@ -33,10 +33,7 @@ Prefix the continuation with indentation, ellipsis and spacing."
   (interactive)
   ;; If point is between the indentation and beginning of line add the
   ;; ellipsis to the previous line. Otherwise add to the next line.
-  (if (not (<= (line-beginning-position)
-	       (point)
-	       (save-excursion
-		 (back-to-indentation) (point))))
+  (if (> (current-column) (current-indentation))
       (progn
 	(delete-horizontal-space)
 	(newline))
